@@ -13,3 +13,7 @@ MAX_VALUE = 1
 class GenDataset(Enum):
     segregation = 'segregation'
     integration = 'integration'
+
+class CalculateMetrics(Enum):
+    segregation = 'segregation'
+    integration = 'integration'
