@@ -7,6 +7,7 @@ CONNECTED_REGIONS = 2 # [2, 9] for integration
 INNERCONNECTED_REGIONS = 2 # [2, 9] for segregation
 SEGREGATED_REGIONS = []
 DS = range(6) # [0, 5]
+CS = range(2, 10)
 MIN_VALUE = 0
 MAX_VALUE = 1
 
@@ -17,3 +18,4 @@ class GenDataset(Enum):
 class CalculateMetrics(Enum):
     segregation = 'segregation'
     integration = 'integration'
+    neutral = 'neutral'
