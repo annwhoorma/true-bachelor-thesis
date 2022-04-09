@@ -90,7 +90,7 @@ if __name__ == '__main__':
         train, valid, test = generate_segregation()
     global_path = f'{gen_dataset.value}_dataset'
     Path(global_path).mkdir(exist_ok=True)
-    for i in range(2, 10):
+    for i in globalenv.CS:
         if gen_dataset == globalenv.GenDataset.integration:
             globalenv.CONNECTED_REGIONS = i
             cr = globalenv.CONNECTED_REGIONS
