@@ -2,8 +2,8 @@ from labels.label_interface import LabelInterface
 
 class Label2(LabelInterface):
     '''neutral'''
-    def __init__(self, num_nodes, num_edges, mask, label_name):
-        super(Label2, self).__init__(num_nodes, num_edges, mask, label_name)
+    def __init__(self, mask, label_name, low_dist, high_dist):
+        super(Label2, self).__init__(mask, label_name, low_dist, high_dist)
         self._generate_regions()
         self._generate_patterns()
         self.A *= self.mask

@@ -3,8 +3,8 @@ from labels.label_interface import LabelInterface
 
 class Label1(LabelInterface):
     '''integration'''
-    def __init__(self, num_nodes, num_edges, mask, label_name):
-        super(Label1, self).__init__(num_nodes, num_edges, mask, label_name)
+    def __init__(self, mask, label_name, low_dist, high_dist):
+        super(Label1, self).__init__(mask, label_name, low_dist, high_dist)
         self.distinguished = self._choose_random_regions(range(self.num_regions), globalenv.CONNECTED_REGIONS)
         self._generate_regions()
         self._generate_patterns()
