@@ -3,14 +3,14 @@ from labels import *
 import numpy as np
 from pathlib import Path
 import globalenv
-from explainer import Explainer
+from explainer import GaussianExplainer
 
 class Dataset:
-    def __init__(self, explainer: Explainer, num_per_label: dict, num_nodes: int, num_edges: int, mask, dir: str):
+    def __init__(self, GaussianExplainer: GaussianExplainer, num_per_label: dict, num_nodes: int, num_edges: int, mask, dir: str):
         self.num_per_label = num_per_label
         self.num_nodes = num_nodes
         self.num_edges = num_edges
-        self.explainer = explainer
+        self.GaussianExplainer = GaussianExplainer
         Path(dir).mkdir(exist_ok=True)
 
         self.dir = dir
@@ -20,7 +20,7 @@ class Dataset:
         for d in globalenv.DS:
             dpath = f'd={d}'
             Path(self.dir, dpath).mkdir(exist_ok=True)
-            d_low, d_high = self.explainer.get_l_distribution(d), self.explainer.get_h_distribution(d)
+            d_low, d_high = self.GaussianExplainer.get_l_distribution(d), self.GaussianExplainer.get_h_distribution(d)
             print
             for LabelClass, (name, num) in tqdm(self.num_per_label.items(), desc=f'd={d}'):
                 Path(self.dir, dpath, name).mkdir(exist_ok=True)
@@ -79,7 +79,7 @@ def generate_segregation():
 
 if __name__ == '__main__':
     gen_dataset = globalenv.GenDataset.segregation
-    explainer = Explainer()
+    GaussianExplainer = GaussianExplainer()
     num_nodes = globalenv.NUM_NODES
     num_edges = num_nodes * (num_nodes - 1) # undirected
     mask = generate_mask(num_nodes, num_edges)
@@ -100,9 +100,9 @@ if __name__ == '__main__':
             icr = globalenv.INNERCONNECTED_REGIONS
             to_save = f'{global_path}/icr={icr}'
         Path(to_save).mkdir(exist_ok=True)
-        train_dataset = Dataset(explainer, train, num_nodes, num_edges, mask, f'{to_save}/train')
-        valid_dataset = Dataset(explainer, valid, num_nodes, num_edges, mask, f'{to_save}/valid')
-        test_dataset = Dataset(explainer, test, num_nodes, num_edges, mask, f'{to_save}/test')
+        train_dataset = Dataset(GaussianExplainer, train, num_nodes, num_edges, mask, f'{to_save}/train')
+        valid_dataset = Dataset(GaussianExplainer, valid, num_nodes, num_edges, mask, f'{to_save}/valid')
+        test_dataset = Dataset(GaussianExplainer, test, num_nodes, num_edges, mask, f'{to_save}/test')
         print('>>> generating train...')
         train_dataset.generate()
         print('>>> generating valid...')
