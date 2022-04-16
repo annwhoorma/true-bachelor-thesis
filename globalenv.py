@@ -19,3 +19,9 @@ class CalculateMetrics(Enum):
     segregation = 'segregation'
     integration = 'integration'
     neutral = 'neutral'
+
+class WeightedMetric(Enum):
+    GlobalEfficiency = 'g_efficiency'
+    GlobalClustering = 'g_clustering'
+    GlobalModularity = 'g_modularity'
+    GlobalParticipation = 'g_participation'
