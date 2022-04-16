@@ -56,6 +56,9 @@ class LabelInterface:
         # normalize the matrix
         self.A /= np.max(self.A)
 
+    def get_connected_regions(self):
+        pass # connections
+
     def _generate_edge_index_coo_format(self):
         self.edge_index_coo = np.array(self.mask.nonzero())
 
@@ -67,15 +70,25 @@ class LabelInterface:
             edge_attr.append(feat)
         self.edge_attr = np.array(edge_attr)
 
-    def to_json(self, path):
+    def to_json(self, path, save_adj=True):
+        '''
+        save_adj=True when we need to visualize
+        '''
         self._generate_edge_index_coo_format()
         self._generate_edge_attr()
-        data = {
-            'num_nodes': self.num_nodes,
-            'adj': json.dumps(self.A.tolist()),
-            'edge_attr': json.dumps(self.edge_attr.tolist()),
-            'edge_index': json.dumps(self.edge_index_coo.tolist())
-        }
+        if save_adj:
+            data = {
+                # 'num_nodes': self.num_nodes,
+                'adj': json.dumps(self.A.tolist()),
+                # 'edge_attr': json.dumps(self.edge_attr.tolist()),
+                # 'edge_index': json.dumps(self.edge_index_coo.tolist())
+            }
+        else:
+            data = {
+                'num_nodes': self.num_nodes,
+                'edge_attr': json.dumps(self.edge_attr.tolist()),
+                'edge_index': json.dumps(self.edge_index_coo.tolist())
+            }
         json.dump(data, open(path/f'{self.name}.json', 'w'))
 
 
