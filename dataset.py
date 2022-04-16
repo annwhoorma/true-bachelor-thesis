@@ -26,7 +26,7 @@ class Dataset:
                 Path(self.dir, dpath, name).mkdir(exist_ok=True)
                 for i in range(num):
                     graph = LabelClass(self.mask, f'{i+1}', d_low, d_high)
-                    graph.to_json(Path(self.dir, dpath, name))
+                    graph.to_json(Path(self.dir, dpath, name), save_adj=False)
 
 
 def make_symmetric(matrix):
@@ -111,11 +111,11 @@ if __name__ == '__main__':
         test_dataset.generate()
 
         with open(f'{to_save}/readme.txt', 'w') as f:
-            f.write(f'number of nodes: {globalenv.NUM_NODES}\n')
-            f.write(f'number of regions: {globalenv.NUM_REGIONS}\n')
-            f.write(f'number of nodes per region: {globalenv.NUM_NODES_PER_REGION}\n')
-            if gen_dataset == globalenv.GenDataset.integration:
-                f.write(f'inner-connected regions: {globalenv.INNERCONNECTED_REGIONS}\n')
-            elif gen_dataset == globalenv.GenDataset.segregation:
-                f.write(f'inner-connected regions: {globalenv.INNERCONNECTED_REGIONS}\n')
+            # f.write(f'number of nodes: {globalenv.NUM_NODES}\n')
+            # f.write(f'number of regions: {globalenv.NUM_REGIONS}\n')
+            # f.write(f'number of nodes per region: {globalenv.NUM_NODES_PER_REGION}\n')
+            # if gen_dataset == globalenv.GenDataset.integration:
+            #     f.write(f'inner-connected regions: {globalenv.INNERCONNECTED_REGIONS}\n')
+            # elif gen_dataset == globalenv.GenDataset.segregation:
+            #     f.write(f'inner-connected regions: {globalenv.INNERCONNECTED_REGIONS}\n')
             f.write(f'd means step number from {globalenv.DS[0]} to {globalenv.DS[-1]}')
