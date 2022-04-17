@@ -3,8 +3,8 @@ from labels.label_interface import LabelInterface
 
 class Label3(LabelInterface):
     '''segregation'''
-    def __init__(self, mask, label_name, low_dist, high_dist):
-        super(Label3, self).__init__(mask, label_name, low_dist, high_dist)
+    def __init__(self, mask, label_name, low_dist, high_dist, dist_type):
+        super(Label3, self).__init__(mask, label_name, low_dist, high_dist, dist_type)
         self.distinguished = self._choose_random_regions(range(self.num_regions), globalenv.INNERCONNECTED_REGIONS)
         self._generate_regions()
         self._generate_patterns()

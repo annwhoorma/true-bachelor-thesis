@@ -14,12 +14,18 @@ class LabelInterface:
     num_nodes = globalenv.NUM_NODES
     num_regions = globalenv.NUM_REGIONS
     nodes_per_region = globalenv.NUM_NODES_PER_REGION
-    def __init__(self, mask, label_name, l_dist, h_dist):
+    def __init__(self, mask: np.ndarray, label_name: str, l_dist: dict, h_dist: dict, dist_type):
+        '''
+        dist_type == globalenv.DistributionType.Normal => l_dist, h_dist ~ {'mu': float, 'sigma': float}
+        dist_type == globalenv.DistributionType.Uniform => l_dist, h_dist ~ {'loc': float, 'scale': float} -> range: [loc, loc + scale]
+        '''
+        assert isinstance(dist_type, globalenv.DistributionType), 'check dist_type parameter'
         self.num_edges = calculate_num_edges(self.num_nodes)
         self.name = label_name
         self.mask = mask
         self.l_dist = l_dist
         self.h_dist = h_dist
+        self.dist_type = dist_type
         self.A = np.zeros((self.num_nodes, self.num_nodes))
         self.all_possible_pairs = [(i, j) for i in range(self.num_regions) for j in range(i, self.num_regions)]
 
@@ -44,20 +50,23 @@ class LabelInterface:
         self.A[r1[0]:r1[-1]+1, r2[0]:r2[-1]+1] = future_region
         self.A[r2[0]:r2[-1]+1, r1[0]:r1[-1]+1] = future_region
 
+    def sample_values_from_dist(self, ws, num_values):
+        if self.dist_type == globalenv.DistributionType.Normal:
+            return np.random.normal(ws['mu'], ws['sigma'], num_values)
+        elif self.dist_type == globalenv.DistributionType.Uniform:
+            return np.random.uniform(ws['loc'], ws['loc'] + ws['scale'], num_values)
+
     def _generate_patterns(self):
         for conn, regss in self.connections.items():
             ws = self.weights[conn]
             for regs in regss:
                 num_values = len(self.regions[regs[0]]) * len(self.regions[regs[1]])
-                values = np.random.normal(ws['mu'], ws['sigma'], num_values)
+                values = self.sample_values_from_dist(ws, num_values)
                 values[values < globalenv.MIN_VALUE] = globalenv.MIN_VALUE
                 values[values > globalenv.MAX_VALUE] = globalenv.MAX_VALUE
                 self._fill_regions_with_values(self.regions[regs[0]], self.regions[regs[1]], values)
         # normalize the matrix
         self.A /= np.max(self.A)
-
-    def get_connected_regions(self):
-        pass # connections
 
     def _generate_edge_index_coo_format(self):
         self.edge_index_coo = np.array(self.mask.nonzero())
