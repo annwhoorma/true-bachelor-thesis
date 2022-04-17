@@ -25,3 +25,7 @@ class WeightedMetric(Enum):
     GlobalClustering = 'g_clustering'
     GlobalModularity = 'g_modularity'
     GlobalParticipation = 'g_participation'
+
+class DistributionType(Enum):
+    Normal = 'normal'
+    Uniform = 'uniform'
