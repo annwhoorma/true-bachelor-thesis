@@ -59,17 +59,19 @@ class UniformExplainer(ExplainerInterface):
 
 class GaussianExplainer(ExplainerInterface):
     num_steps = 5
-    mu = 0.509187
-    d = 0.077008
-    sigma = 0.19252
+    mu = 0.5
+    d = 0.0675684
+    sigma = 0.168921
+    # mul_5 = 0.331079
+    # muh_5 = 0.668921
     def __init__(self):
         super().__init__()
 
     def _generate_mus(self):
         self.mus = [(self.mu, self.mu)]
-        for i in range(self.num_steps):
-            mu_l = self.mus[i][0] - 0.5 * self.d
-            mu_h = self.mus[i][1] + 0.5 * self.d
+        for n in range(self.num_steps):
+            mu_l = self.mus[n][0] - 0.5 * self.d
+            mu_h = self.mus[n][1] + 0.5 * self.d
             self.mus.append((mu_l, mu_h))
 
     def get_l_distribution(self, d):
