@@ -16,7 +16,7 @@ class LabelInterface:
     nodes_per_region = globalenv.NUM_NODES_PER_REGION
     def __init__(self, mask: np.ndarray, label_name: str, l_dist: dict, h_dist: dict, dist_type):
         '''
-        dist_type == globalenv.DistributionType.Normal => l_dist, h_dist ~ {'mu': float, 'sigma': float}
+        dist_type == globalenv.DistributionType.Normal => l_dist, h_dist ~ {'mu': float, 'var': float}
         dist_type == globalenv.DistributionType.Uniform => l_dist, h_dist ~ {'loc': float, 'scale': float} -> range: [loc, loc + scale]
         '''
         assert isinstance(dist_type, globalenv.DistributionType), 'check dist_type parameter'
@@ -52,7 +52,7 @@ class LabelInterface:
 
     def sample_values_from_dist(self, ws, num_values):
         if self.dist_type == globalenv.DistributionType.Normal:
-            return np.random.normal(ws['mu'], ws['sigma'], num_values)
+            return np.random.normal(ws['mu'], ws['var'], num_values)
         elif self.dist_type == globalenv.DistributionType.Uniform:
             return np.random.uniform(ws['loc'], ws['loc'] + ws['scale'], num_values)
 
