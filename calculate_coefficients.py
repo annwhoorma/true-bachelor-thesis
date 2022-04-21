@@ -41,47 +41,6 @@ def are_in_the_same_region(u, v, regions):
             return True
     return False
 
-def get_modularity_coefficient(graph: nx.Graph, regions: 'list[set[int]]') -> float:
-    weight = "weight"
-    q_is = []
-
-    out_degree = dict(graph.degree(weight=weight))
-    deg_sum = sum(out_degree.values()) / 2
-    ks = {v: sum(graph.adj[i][u]['weight'] for (i, u) in graph.edges() if i == v or u == v) for v in graph.nodes()}
-
-    for (i, j) in graph.edges():
-        w_ij = graph.adj[i][j]['weight']
-        k_i = ks[i]
-        k_j = ks[j]
-        term = w_ij - k_i * k_j / deg_sum
-        sigmami_sigmamj = int(are_in_the_same_region(i, j, regions))
-        q_i = term * sigmami_sigmamj
-        q_is.append(q_i)
-    return np.sum(q_is) / deg_sum
-
-def get_participation_coefficient(graph: nx.Graph, regions: 'list[set[int]]'):
-    # если связи внутри сегр. регионов усиливаются, этот коэфф падает
-    global_pc = []
-    ks = {v: sum(graph.adj[i][u]['weight'] for (i, u) in graph.edges() if i == v or u == v) for v in graph.nodes()}
-    for v in graph.nodes():
-        k_i = ks[v]
-        temp = []
-        for region in regions:
-            ki_m = sum(graph.adj[v][u]['weight'] for u in region if (v, u) in graph.edges())
-            term = ki_m / k_i
-            temp.append(term ** 2)
-        pc_i = 1 - sum(temp)
-        global_pc.append(pc_i)
-    return np.mean(global_pc)
-
-def calculate_for_nx(graph: LabelInterface, regions: 'list[set[int]]') -> 'tuple[float]':
-    nxgraph = graph_to_nxgraph(graph.A)
-    eff = get_global_clustering_score(nxgraph)
-    clus = get_global_efficiency_score(nxgraph)
-    modularity = get_modularity_coefficient(nxgraph, regions)
-    participation = get_participation_coefficient(nxgraph, regions)
-    return eff, clus, modularity, participation
-
 def calculate_average_metrics(num_graphs: int, explainer: Explainer, d: int, ClassLabel: LabelInterface, save_graphs: bool, to_save: str) -> 'tuple[float]':
     effs, cluss, moduls, particips = [], [], [], []
     num_nodes = globalenv.NUM_NODES
