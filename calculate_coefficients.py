@@ -5,7 +5,6 @@ from labels import Label1, Label2, Label3
 from dataset import generate_mask
 import globalenv
 import numpy as np
-import networkx.algorithms.community as nx_comm
 from pathlib import Path
 import bct
 
