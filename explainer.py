@@ -62,7 +62,8 @@ class GaussianExplainer(ExplainerInterface):
     num_steps = 5
     mu = 0.5
     d = 0.0675684
-    var = 0.168921
+    sigma = 0.168921
+    # sigma = sigma ** 2
     # mul_5 = 0.331079
     # muh_5 = 0.668921
     def __init__(self):
@@ -80,39 +81,42 @@ class GaussianExplainer(ExplainerInterface):
         at d=0 l distribution and h distribution are the same
         '''
         assert 0 <= d <= self.num_steps
-        return {'mu': self.mus[d][0], 'var': self.var}
+        return {'mu': self.mus[d][0], 'sigma': self.sigma}
 
     def get_h_distribution(self, d):
         assert 0 <= d <= self.num_steps
-        return {'mu': self.mus[d][1], 'var': self.var}
+        return {'mu': self.mus[d][1], 'sigma': self.sigma}
 
     def draw_distribtutions(self):
         for mu_l, mu_h in self.mus:
-            x_l = np.linspace(mu_l - 10*self.var, mu_l + 10*self.var, 100)
-            x_h = np.linspace(mu_h - 10*self.var, mu_h + 10*self.var, 100)
+            x_l = np.linspace(mu_l - 10*self.sigma, mu_l + 10*self.sigma, 100)
+            x_h = np.linspace(mu_h - 10*self.sigma, mu_h + 10*self.sigma, 100)
             fig = plt.figure(figsize=(10, 5), dpi=100)
             ax = fig.add_subplot()
-            ax.plot(x_l, stats.norm.pdf(x_l, mu_l, self.var))
-            ax.plot(x_h, stats.norm.pdf(x_h, mu_h, self.var))
+            ax.plot(x_l, stats.norm.pdf(x_l, mu_l, self.sigma))
+            ax.plot(x_h, stats.norm.pdf(x_h, mu_h, self.sigma))
             ax.axvline(x=0, c='black')
             ax.axvline(x=1, c='black')
             plt.show()
     
     def draw_distributions_plotly(self):
         for mu_l, mu_h in self.mus:
-            x_l = np.linspace(mu_l - 10*self.var, mu_l + 10*self.var, 1000)
-            y_l = stats.norm.pdf(x_l, mu_l, self.var)
-            x_h = np.linspace(mu_h - 10*self.var, mu_h + 10*self.var, 1000)
-            y_h = stats.norm.pdf(x_h, mu_h, self.var)
+            x_l = np.linspace(mu_l - 10*self.sigma, mu_l + 10*self.sigma, 2000)
+            y_l = stats.norm.pdf(x_l, mu_l, self.sigma)
+            x_h = np.linspace(mu_h - 10*self.sigma, mu_h + 10*self.sigma, 2000)
+            y_h = stats.norm.pdf(x_h, mu_h, self.sigma)
             fig = go.Figure()
             fig.add_trace(go.Scatter(x=x_l, y=y_l, mode='lines', name='Low', line=dict(width=7)))
             fig.add_trace(go.Scatter(x=x_h, y=y_h, mode='lines', name='High', line=dict(width=7)))
-            fig.add_vline(x=0), fig.add_vline(x=1)
+            fig.add_vline(x=0, line_width=3), fig.add_vline(x=1, line_width=3)
+            fig.add_vline(x=mu_l, line_width=5, line_dash="dash", line_color="blue")
+            fig.add_vline(x=mu_h, line_width=5, line_dash="dash", line_color="red")
             fig.update_layout(width=2000, height=1000, xaxis_range=[-0.1, 1.1],
                             font=dict(size=50))
             fig.show()
-            break
 
 explainer = GaussianExplainer()
 print(np.round(explainer.mus, 6))
 explainer.draw_distributions_plotly()
+
+# %%
