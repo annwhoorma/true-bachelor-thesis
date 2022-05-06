@@ -23,16 +23,18 @@ class UniformExplainer(ExplainerInterface):
     mu = 0.5
     len_range = 0.5
     final_overlap = 0.1
-    step = (len_range - final_overlap) / (2 * num_steps)
+    d = (len_range - final_overlap) / (2 * num_steps)
     def __init__(self):
         super().__init__()
+        print(self.d)
 
     def _generate_mus(self):
         self.mus = [(self.mu, self.mu)] # loc, scale => [loc, loc + scale]
-        for i in range(self.num_steps):
-            mu_l = self.mus[-1][0] - self.step
-            mu_h = self.mus[-1][1] + self.step
+        for _ in range(self.num_steps):
+            mu_l = self.mus[-1][0] - self.d
+            mu_h = self.mus[-1][1] + self.d
             self.mus.append((mu_l, mu_h))
+        print(self.mus)
 
     def get_l_distribution(self, d):
         assert 0 <= d <= self.num_steps
@@ -44,8 +46,6 @@ class UniformExplainer(ExplainerInterface):
 
     def draw_distribtutions(self):
         for mu_l, mu_h in self.mus:
-            # x_l = np.linspace(mu_l - self.len_range / 2, mu_l + self.len_range / 2, 20)
-            # x_h = np.linspace(mu_h - self.len_range / 2, mu_h + self.len_range / 2, 20)
             x_l = np.linspace(0, 1, 500)
             x_h = np.linspace(0, 1, 500)
             fig = plt.figure(figsize=(5, 5), dpi=100)
@@ -56,6 +56,22 @@ class UniformExplainer(ExplainerInterface):
             ax.axvline(x=0, c='black')
             ax.axvline(x=1, c='black')
             plt.show()
+
+    def draw_distributions_plotly(self):
+        for mu_l, mu_h in self.mus:
+            x_l = np.linspace(0, 1, 1000)
+            x_h = np.linspace(0, 1, 1000)
+            y_l = stats.uniform.pdf(x_l, mu_l - self.len_range / 2, self.len_range)
+            y_h = stats.uniform.pdf(x_h, mu_h - self.len_range / 2, self.len_range)
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(x=x_l, y=y_l, mode='lines', name='Low', line=dict(width=7)))
+            fig.add_trace(go.Scatter(x=x_h, y=y_h, mode='lines', name='High', line=dict(width=7)))
+            fig.add_vline(x=0, line_width=3), fig.add_vline(x=1, line_width=3)
+            fig.add_vline(x=mu_l, line_width=5, line_dash="dash", line_color="blue")
+            fig.add_vline(x=mu_h, line_width=5, line_dash="dash", line_color="red")
+            fig.update_layout(width=1000, height=500, xaxis_range=[-0.1, 1.1],
+                            font=dict(size=50))
+            fig.show()
 
 
 class GaussianExplainer(ExplainerInterface):
@@ -115,8 +131,9 @@ class GaussianExplainer(ExplainerInterface):
                             font=dict(size=50))
             fig.show()
 
-explainer = GaussianExplainer()
-print(np.round(explainer.mus, 6))
-explainer.draw_distributions_plotly()
+if __name__ == '__main__':
+    explainer = UniformExplainer()
+    # print(np.round(explainer.mus, 6))
+    explainer.draw_distributions_plotly()
 
 # %%

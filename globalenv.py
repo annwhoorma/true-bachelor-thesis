@@ -1,13 +1,21 @@
 from enum import Enum
 
-NUM_NODES = 81
-NUM_REGIONS = 9
-NUM_NODES_PER_REGION = 9
-CONNECTED_REGIONS = 2 # [2, 9] for integration
-INNERCONNECTED_REGIONS = 2 # [2, 9] for segregation
+NUM_REGIONS = 12
+NUM_NODES_PER_REGION = 5
+NUM_NODES = NUM_REGIONS * NUM_NODES_PER_REGION
+CONNECTED_REGIONS = None
+INNERCONNECTED_REGIONS = None
+
+class DistributionType(Enum):
+    Normal = 'normal'
+    Uniform = 'uniform'
+    
+DIST_TYPE = DistributionType.Normal
+
+REGIONS_RANGE = [int(ratio * NUM_REGIONS) for ratio in [0.25, 0.5, 0.75, 1]]
+NS = range(6) # [0, 5]
+
 SEGREGATED_REGIONS = []
-DS = range(6) # [0, 5]
-CS = range(2, 10)
 MIN_VALUE = 0
 MAX_VALUE = 1
 
@@ -25,7 +33,3 @@ class WeightedMetric(Enum):
     GlobalClustering = 'g_clustering'
     GlobalModularity = 'g_modularity'
     GlobalParticipation = 'g_participation'
-
-class DistributionType(Enum):
-    Normal = 'normal'
-    Uniform = 'uniform'

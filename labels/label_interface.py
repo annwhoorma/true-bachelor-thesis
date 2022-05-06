@@ -51,9 +51,9 @@ class LabelInterface:
         self.A[r2[0]:r2[-1]+1, r1[0]:r1[-1]+1] = future_region
 
     def sample_values_from_dist(self, ws, num_values):
-        if self.dist_type == globalenv.DistributionType.Normal:
+        if self.dist_type is globalenv.DistributionType.Normal:
             return np.random.normal(ws['mu'], ws['sigma'], num_values)
-        elif self.dist_type == globalenv.DistributionType.Uniform:
+        elif self.dist_type is globalenv.DistributionType.Uniform:
             return np.random.uniform(ws['loc'], ws['loc'] + ws['scale'], num_values)
 
     def _generate_patterns(self):

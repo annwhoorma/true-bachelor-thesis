@@ -17,7 +17,7 @@ class Dataset:
         self.mask = mask
 
     def generate(self):
-        for d in globalenv.DS:
+        for d in globalenv.NS:
             dpath = f'd={d}'
             Path(self.dir, dpath).mkdir(exist_ok=True)
             d_low, d_high = self.GaussianExplainer.get_l_distribution(d), self.GaussianExplainer.get_h_distribution(d)
@@ -25,8 +25,8 @@ class Dataset:
             for LabelClass, (name, num) in tqdm(self.num_per_label.items(), desc=f'd={d}'):
                 Path(self.dir, dpath, name).mkdir(exist_ok=True)
                 for i in range(num):
-                    graph = LabelClass(self.mask, f'{i+1}', d_low, d_high)
-                    graph.to_json(Path(self.dir, dpath, name), save_adj=False)
+                    graph = LabelClass(self.mask, f'{i+1}', d_low, d_high, globalenv.DIST_TYPE)
+                    graph.to_json(Path(self.dir, dpath, name), save_adj=True) # save_adj TRUE ONLY FOR VISUALIZATION
 
 
 def make_symmetric(matrix):
@@ -47,8 +47,8 @@ def generate_mask(num_nodes, num_edges, fully_conn=True):
 
 def generate_integration():
     train = {
-        Label1: ('integration', 1),
-        Label2: ('neutral', 1)
+        Label1: ('integration', 3),
+        Label2: ('neutral', 3)
     }
     valid = {
         Label1: ('integration', 0),
@@ -63,8 +63,8 @@ def generate_integration():
 
 def generate_segregation():
     train = {
-        Label3: ('segregation', 1),
-        Label2: ('neutral', 1)
+        Label3: ('segregation', 3),
+        Label2: ('neutral', 3)
     }
     valid = {
         Label3: ('segregation', 0),
@@ -78,7 +78,8 @@ def generate_segregation():
 
 
 if __name__ == '__main__':
-    gen_dataset = globalenv.GenDataset.segregation
+    gen_dataset = globalenv.GenDataset.integration
+    dist_type = globalenv.DIST_TYPE.value
     GaussianExplainer = GaussianExplainer()
     num_nodes = globalenv.NUM_NODES
     num_edges = num_nodes * (num_nodes - 1) # undirected
@@ -88,9 +89,9 @@ if __name__ == '__main__':
         train, valid, test = generate_integration()
     elif gen_dataset == globalenv.GenDataset.segregation:
         train, valid, test = generate_segregation()
-    global_path = f'{gen_dataset.value}_dataset'
+    global_path = f'{gen_dataset.value}_{dist_type}_dataset'
     Path(global_path).mkdir(exist_ok=True)
-    for i in globalenv.CS:
+    for i in globalenv.REGIONS_RANGE:
         if gen_dataset == globalenv.GenDataset.integration:
             globalenv.CONNECTED_REGIONS = i
             cr = globalenv.CONNECTED_REGIONS
@@ -118,4 +119,4 @@ if __name__ == '__main__':
             #     f.write(f'inner-connected regions: {globalenv.INNERCONNECTED_REGIONS}\n')
             # elif gen_dataset == globalenv.GenDataset.segregation:
             #     f.write(f'inner-connected regions: {globalenv.INNERCONNECTED_REGIONS}\n')
-            f.write(f'd means step number from {globalenv.DS[0]} to {globalenv.DS[-1]}')
+            f.write(f'd means step number from {globalenv.NS[0]} to {globalenv.NS[-1]}')
