@@ -13,8 +13,17 @@ def graph_to_nxgraph(weights_matrix) -> nx.Graph:
     return graph
 
 def get_global_efficiency_score(num_nodes, g: nx.Graph) -> float:
-    shortest_paths = [[nx.dijkstra_path_length(g, i, j, weight='weight') for i in range(num_nodes)] for j in range(num_nodes)]
-    shortest_paths = np.array(shortest_paths)
+    # shortest_paths = [[nx.dijkstra_path_length(g, i, j, weight='weight') for i in range(num_nodes)] for j in range(num_nodes)]
+    # shortest_paths = np.array(shortest_paths)
+    shortest_paths = np.zeros((num_nodes, num_nodes))
+    for j in range(num_nodes):
+        for i in range(i+1, num_nodes):
+            try:
+                shortest_paths[i, j] = nx.dijkstra_path_length(g, i, j, weight='weight')
+            except:
+                # if node is unreachable
+                shortest_paths[j, i] = 0
+    shortest_paths += shortest_paths.T
     np.fill_diagonal(shortest_paths, 0)
     N = shortest_paths.shape[0]
     nodal_efficiency = (1.0 / (N-1)) * np.apply_along_axis(sum, 0, shortest_paths)
@@ -22,6 +31,22 @@ def get_global_efficiency_score(num_nodes, g: nx.Graph) -> float:
 
 def get_global_clustering_score(graph: nx.Graph) -> float:
     return nx.average_clustering(graph, weight="weight")
+
+# старые метрики
+def generate_cluster_effic_for_nn_nnpr():
+    all_num_regions = range(2, 11)
+    all_num_nodes_per_region = range(2, 11)
+    all_net_types = [NetworkType.Integration, NetworkType.Segregation]
+    with open('cluster_effic_nn_nnpr.csv', 'w') as f:
+        f.write('net_type,num_regions,num_nodes_per_region,clustering,efficiency\n')
+        for net_type in all_net_types:
+            print(net_type.value)
+            for num_regions in all_num_regions:
+                print(f'nr: {num_regions}')
+                for num_nodes_per_region in all_num_nodes_per_region:
+                    _, adj = create_network(num_regions, num_nodes_per_region, net_type)
+                    clustering, efficiency = calculate_old(adj)
+                    f.write(f'{net_type.value},{num_regions},{num_nodes_per_region},{clustering},{efficiency}\n')
 
 
 
@@ -250,4 +275,4 @@ def from_integrated_to_segregated_for_fixed_nnprs_with_old_metrics():
 
 
 if __name__ == '__main__':
-    from_integrated_to_segregated_for_fixed_nnprs_with_old_metrics()
+    generate_cluster_effic_for_nn_nnpr()

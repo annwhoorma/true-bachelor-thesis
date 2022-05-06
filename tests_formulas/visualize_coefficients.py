@@ -23,7 +23,7 @@ def visualize_all_coeffs(df, metric_name, color, title):
     return fig
 
 #%%
-df = pd.read_csv('coefficients.csv')
+df = pd.read_csv('modul_particip_nn_nnpr.csv')
 int_df = df[df['net_type'] == 'integration'].drop(['net_type'], axis=1)
 seg_df = df[df['net_type'] == 'segregation'].drop(['net_type'], axis=1)
 

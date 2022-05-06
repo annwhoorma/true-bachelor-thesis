@@ -69,11 +69,11 @@ def calculate_coeffs(adj, kci):
     return round(modularity, 4), round(g_participation, 4)
 
 
-if __name__ == '__main__':
-    all_num_regions = range(2, 30)
+def generate_modul_partic_for_nn_nnpr():
+    all_num_regions = range(2, 21)
     all_num_nodes_per_region = range(2, 21)
     all_net_types = [NetworkType.Integration, NetworkType.Segregation]
-    with open('coefficients.csv', 'w') as f:
+    with open('modul_particip_nn_nnpr.csv', 'w') as f:
         f.write('net_type,num_regions,num_nodes_per_region,bct_modularity,bct_participation\n')
         for net_type in all_net_types:
             for num_regions in all_num_regions:
@@ -82,3 +82,21 @@ if __name__ == '__main__':
                     kci = [idx for idx, region in enumerate(connected_regions) for _ in region]
                     modularity, participation = calculate_coeffs(adj, kci)
                     f.write(f'{net_type.value},{num_regions},{num_nodes_per_region},{modularity},{participation}\n')
+
+
+
+def generate_for_convergence():
+    all_num_regions = range(2, 21)
+    nodes_per_region = 10
+    all_net_types = [NetworkType.Integration, NetworkType.Segregation]
+    with open('for_convergence.csv', 'w') as f:
+        f.write('network type,number of regions (nr),number of nodes per region (nnpr),modularity,participation\n')
+        for net_type in all_net_types:
+            for num_regions in all_num_regions:
+                connected_regions, adj = create_network(num_regions, nodes_per_region, net_type)
+                kci = [idx for idx, region in enumerate(connected_regions) for _ in region]
+                modularity, participation = calculate_coeffs(adj, kci)
+                f.write(f'{net_type.value},{num_regions},{nodes_per_region},{modularity},{participation}\n')
+
+if __name__ == '__main__':
+    generate_for_convergence()

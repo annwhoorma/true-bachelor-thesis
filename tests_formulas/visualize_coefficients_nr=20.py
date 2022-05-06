@@ -1,4 +1,6 @@
 #%%
+from turtle import width
+from matplotlib import markers
 import pandas as pd
 import numpy as np
 import plotly.express as px
@@ -61,7 +63,7 @@ def visualize_parametric_dep(df: pd.DataFrame, metric1, metric2, title):
     unique_nr = df['nr'].unique()
     for nr in unique_nr:
         ldf = df[df['nr'] == nr]
-        fig.add_trace(go.Scatter(x=ldf[metric1], y=ldf[metric2], mode='markers', name=f'nr = {nr}'))
+        fig.add_trace(go.Scatter(x=ldf[metric1], y=ldf[metric2], mode='lines+markers', name=f'nr = {nr}'))
     fig.update_layout(title=title,
                     xaxis_title=metric1,
                     yaxis_title=metric2)
@@ -104,16 +106,31 @@ for csv_file in csvs:
     df = pd.read_csv(f'{folder}/{csv_file}')
     fc_line = df[df['net_type'] == 'fully-connected']
     _, _, step_num, _, _, _, _ = fc_line.values[0].tolist()
-    # visualize_for_fixed_nnpr(df, 'bct_modularity', step_num, df_name).show()
-    # visualize_for_fixed_nnpr(df, 'bct_participation', step_num, df_name).show()
+    visualize_for_fixed_nnpr(df, 'bct_modularity', step_num, df_name).show()
+    visualize_for_fixed_nnpr(df, 'bct_participation', step_num, df_name).show()
     visualize_for_fixed_nnpr(df, 'clustering', step_num, df_name).show()
     visualize_for_fixed_nnpr(df, 'efficiency', step_num, df_name).show()
 # %%
-folder = 'for_fixed_nnpr_with_old'
-csv_file = 'nnpr=6.csv'
-df = pd.read_csv(f'{folder}/{csv_file}')
-visualize_parametric_dep(df, 'bct_modularity', 'clustering', csv_file).show()
 
+def visualize_parametric_dep(df: pd.DataFrame, metric1, metric2, title):
+    colors = ['blue', 'red', 'green']
+    fig = go.Figure()
+    unique_nr = df['nr'].unique()
+    for nr, color in zip(unique_nr, colors):
+        ldf = df[df['nr'] == nr]
+        fig.add_trace(go.Scatter(x=ldf[metric1], y=ldf[metric2], mode='lines+markers', name=f'nr = {nr}', marker_color=color))
+        midpoint = ldf[ldf['net_type'] == 'fully-connected']
+        print(midpoint[metric1].values[0], midpoint[metric2].values[0])
+        x, y = midpoint[metric1].values[0], midpoint[metric2].values[0]
+        fig.add_trace(go.Scatter(x=[x], y=[y], mode='markers', marker_color=color, marker_size=15, name=f'nr = {nr}: FC'))
+    fig.update_layout(title=title,
+                    xaxis_title=metric1,
+                    yaxis_title=metric2)
+    return fig
+
+folder = 'for_fixed_nnpr_with_old'
+csv_file = 'nnpr=18.csv'
 df = pd.read_csv(f'{folder}/{csv_file}')
-visualize_parametric_dep(df, 'bct_participation', 'efficiency', csv_file).show()
+visualize_parametric_dep(df, 'modularity', 'clustering', csv_file).show()
+visualize_parametric_dep(df, 'participation', 'efficiency', csv_file).show()
 # %%
