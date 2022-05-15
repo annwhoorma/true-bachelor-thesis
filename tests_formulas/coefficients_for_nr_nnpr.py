@@ -1,7 +1,6 @@
 import random
 from test_bct import *
 import numpy as np
-from enum import Enum
 from pathlib import Path
 from math import ceil
 import networkx as nx
@@ -13,13 +12,11 @@ def graph_to_nxgraph(weights_matrix) -> nx.Graph:
     return graph
 
 def get_global_efficiency_score(num_nodes, g: nx.Graph) -> float:
-    # shortest_paths = [[nx.dijkstra_path_length(g, i, j, weight='weight') for i in range(num_nodes)] for j in range(num_nodes)]
-    # shortest_paths = np.array(shortest_paths)
     shortest_paths = np.zeros((num_nodes, num_nodes))
     for j in range(num_nodes):
-        for i in range(i+1, num_nodes):
+        for i in range(j+1, num_nodes):
             try:
-                shortest_paths[i, j] = nx.dijkstra_path_length(g, i, j, weight='weight')
+                shortest_paths[i, j] = 1 / nx.dijkstra_path_length(g, i, j, weight='weight')
             except:
                 # if node is unreachable
                 shortest_paths[j, i] = 0
@@ -34,8 +31,8 @@ def get_global_clustering_score(graph: nx.Graph) -> float:
 
 # старые метрики
 def generate_cluster_effic_for_nn_nnpr():
-    all_num_regions = range(2, 11)
-    all_num_nodes_per_region = range(2, 11)
+    all_num_regions = range(2, 13)
+    all_num_nodes_per_region = range(2, 8)
     all_net_types = [NetworkType.Integration, NetworkType.Segregation]
     with open('cluster_effic_nn_nnpr.csv', 'w') as f:
         f.write('net_type,num_regions,num_nodes_per_region,clustering,efficiency\n')
@@ -228,14 +225,14 @@ def calculate_old(adj):
     efficiency = get_global_efficiency_score(num_nodes, nxgraph)
     return clustering, efficiency
 
-def from_integrated_to_segregated_for_fixed_nnprs_with_old_metrics():
+def from_segreg_to_integrated_for_fixed_nnprs_with_old_metrics():
     folder = 'for_fixed_nnpr_with_old/'
     num_steps = 15
     Path(folder).mkdir(exist_ok=True)
-    for nnpr in [6, 12, 18]:
+    for nnpr in [10]: # it doesnt affect the result
         filename = f'{folder}/nnpr={nnpr}.csv'
         with open(filename, 'w') as f:
-            f.write('net_type,nr,step,bct_modularity,bct_participation,clustering,efficiency\n')
+            f.write('net_type,nr,step,modularity,participation,clustering,efficiency\n')
             for nr in [6, 12, 18]:
                 print(f'nnpr = {nnpr} | nr = {nr}')
                 net_type = NetworkType.Segregation
