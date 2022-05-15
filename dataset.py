@@ -3,14 +3,14 @@ from labels import *
 import numpy as np
 from pathlib import Path
 import globalenv
-from explainer import GaussianExplainer
+from explainer import GaussianExplainer, UniformExplainer
 
 class Dataset:
-    def __init__(self, GaussianExplainer: GaussianExplainer, num_per_label: dict, num_nodes: int, num_edges: int, mask, dir: str):
+    def __init__(self, explainer, num_per_label: dict, num_nodes: int, num_edges: int, mask, dir: str):
         self.num_per_label = num_per_label
         self.num_nodes = num_nodes
         self.num_edges = num_edges
-        self.GaussianExplainer = GaussianExplainer
+        self.explainer = explainer
         Path(dir).mkdir(exist_ok=True)
 
         self.dir = dir
@@ -20,7 +20,7 @@ class Dataset:
         for d in globalenv.NS:
             dpath = f'd={d}'
             Path(self.dir, dpath).mkdir(exist_ok=True)
-            d_low, d_high = self.GaussianExplainer.get_l_distribution(d), self.GaussianExplainer.get_h_distribution(d)
+            d_low, d_high = self.explainer.get_l_distribution(d), self.explainer.get_h_distribution(d)
             print
             for LabelClass, (name, num) in tqdm(self.num_per_label.items(), desc=f'd={d}'):
                 Path(self.dir, dpath, name).mkdir(exist_ok=True)
@@ -47,8 +47,8 @@ def generate_mask(num_nodes, num_edges, fully_conn=True):
 
 def generate_integration():
     train = {
-        Label1: ('integration', 3),
-        Label2: ('neutral', 3)
+        Label1: ('integration', 1),
+        Label2: ('neutral', 1)
     }
     valid = {
         Label1: ('integration', 0),
@@ -63,8 +63,8 @@ def generate_integration():
 
 def generate_segregation():
     train = {
-        Label3: ('segregation', 3),
-        Label2: ('neutral', 3)
+        Label3: ('segregation', 1),
+        Label2: ('neutral', 1)
     }
     valid = {
         Label3: ('segregation', 0),
@@ -80,16 +80,15 @@ def generate_segregation():
 if __name__ == '__main__':
     gen_dataset = globalenv.GenDataset.integration
     dist_type = globalenv.DIST_TYPE.value
-    GaussianExplainer = GaussianExplainer()
+    explainer = UniformExplainer() if globalenv.DIST_TYPE is globalenv.DistributionType.Uniform else GaussianExplainer()
     num_nodes = globalenv.NUM_NODES
     num_edges = num_nodes * (num_nodes - 1) # undirected
     mask = generate_mask(num_nodes, num_edges)
-
     if gen_dataset == globalenv.GenDataset.integration:
         train, valid, test = generate_integration()
     elif gen_dataset == globalenv.GenDataset.segregation:
         train, valid, test = generate_segregation()
-    global_path = f'{gen_dataset.value}_{dist_type}_dataset'
+    global_path = f'__{gen_dataset.value}_{dist_type}_dataset'
     Path(global_path).mkdir(exist_ok=True)
     for i in globalenv.REGIONS_RANGE:
         if gen_dataset == globalenv.GenDataset.integration:
@@ -101,9 +100,9 @@ if __name__ == '__main__':
             icr = globalenv.INNERCONNECTED_REGIONS
             to_save = f'{global_path}/icr={icr}'
         Path(to_save).mkdir(exist_ok=True)
-        train_dataset = Dataset(GaussianExplainer, train, num_nodes, num_edges, mask, f'{to_save}/train')
-        valid_dataset = Dataset(GaussianExplainer, valid, num_nodes, num_edges, mask, f'{to_save}/valid')
-        test_dataset = Dataset(GaussianExplainer, test, num_nodes, num_edges, mask, f'{to_save}/test')
+        train_dataset = Dataset(explainer, train, num_nodes, num_edges, mask, f'{to_save}/train')
+        valid_dataset = Dataset(explainer, valid, num_nodes, num_edges, mask, f'{to_save}/valid')
+        test_dataset = Dataset(explainer, test, num_nodes, num_edges, mask, f'{to_save}/test')
         print('>>> generating train...')
         train_dataset.generate()
         print('>>> generating valid...')
