@@ -4,6 +4,6 @@ __pycache__/
 
 *_dataset/
 deprecated/
-*.csv
 /test*.py
 *.zip
+thesis_matrices/*
