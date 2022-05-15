@@ -9,8 +9,8 @@ INNERCONNECTED_REGIONS = None
 class DistributionType(Enum):
     Normal = 'normal'
     Uniform = 'uniform'
-    
-DIST_TYPE = DistributionType.Normal
+
+DIST_TYPE = DistributionType.Uniform
 
 REGIONS_RANGE = [int(ratio * NUM_REGIONS) for ratio in [0.25, 0.5, 0.75, 1]]
 NS = range(6) # [0, 5]
@@ -29,7 +29,7 @@ class CalculateMetrics(Enum):
     neutral = 'neutral'
 
 class WeightedMetric(Enum):
-    GlobalEfficiency = 'g_efficiency'
-    GlobalClustering = 'g_clustering'
-    GlobalModularity = 'g_modularity'
-    GlobalParticipation = 'g_participation'
+    GlobalEfficiency = 'efficiency'
+    GlobalClustering = 'clustering'
+    GlobalModularity = 'modularity'
+    GlobalParticipation = 'participation'
