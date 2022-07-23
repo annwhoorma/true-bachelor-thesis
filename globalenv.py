@@ -10,7 +10,6 @@ class DistributionType(Enum):
     Normal = 'normal'
     Uniform = 'uniform'
 
-DIST_TYPE = DistributionType.Uniform
 
 REGIONS_RANGE = [int(ratio * NUM_REGIONS) for ratio in [0.25, 0.5, 0.75, 1]]
 NS = range(6) # [0, 5]
@@ -22,6 +21,10 @@ MAX_VALUE = 1
 class GenDataset(Enum):
     segregation = 'segregation'
     integration = 'integration'
+    neutral = 'neutral'
+
+DIST_TYPE = DistributionType.Normal
+DATASET_TYPE = GenDataset.neutral
 
 class CalculateMetrics(Enum):
     segregation = 'segregation'
