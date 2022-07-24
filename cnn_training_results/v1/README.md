@@ -1,4 +1,4 @@
-This CNN has 7M parameters
+This CNN has 4.2M parameters
 
 ```
 MainModel(
